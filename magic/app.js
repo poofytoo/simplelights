@@ -7,19 +7,16 @@ var serialPort = new SerialPort("/dev/tty.usbmodem1411", {
 serialPort.on("open", function () {
   console.log('open');
   
+  serialPort.write('t', function(err, results) {
+    console.log('err ' + err);
+    console.log('results ' + results);
+  });
+    
+  /*
   serialPort.on('data', function(data) {
     console.log('data received: ' + data);
-    
-    serialPort.write('t', function(err, results) {
-      console.log('err ' + err);
-      console.log('results ' + results);
-      
-      //serialPort.write("hey");
-      
-    });
-  
   });
-  
+  */
 });
 
 var s = require("serialport");
