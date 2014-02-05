@@ -1,0 +1,12 @@
+{
+  "name": "simplelights",
+  "description": "Server Communication with Simple Lighting System",
+  "author": "Victor Hung <victorhung92@gmail.com>",
+  "dependencies": {
+    "serialport": "*"
+  },
+  "engines": {
+    "node": "0.8.16"
+  },
+  "license": "MIT"
+}
