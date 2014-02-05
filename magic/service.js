@@ -5,38 +5,32 @@ function serialConnection() {
     baudrate: 9600
   });
   
-  serialPort.on("open", function () {
-    
-    serialPort.write('t', function(err, results) {
-      // Sent
+  serialPort.on('open', function () {
+    console.log('serial connection established...');
+    serialPort.write('a', function(err, results) {
+      console.log('sending hello world byte...');
+      if (err != undefined){
+        console.log(err);
+      }
     });
-    
-    /*
-    serialPort.on('data', function(data) {
-      console.log('data received: ' + data);
-    });
-    */
-    
-    setInterval(function(){
-      serialPort.write('a');
-    }, 1000);
   }); 
   
+  this.sendSimpleCommand = function(){
+    serialPort.write('a', function(err, results) {
+      if (err != undefined){
+        console.log(err);
+      }
+    });
+  }
+  
+  this.discoverPorts = function(){
+    var s = require("serialport");
+    s.list(function (err, ports) {
+      ports.forEach(function(port) {
+        console.log(port.comName + " " + port.manufacturer);
+      });
+    });
+  }
 }
 
 module.exports = serialConnection;
-
-/*
-var s = require("serialport");
-
-s.list(function (err, ports) {
-  ports.forEach(function(port) {
-    console.log(port.comName);
-    console.log(port.pnpId);
-    console.log(port.manufacturer);
-  });
-});
-*/
-
-/*setTimeout(function(){serialPort.write(0xFF); serialPort.write("\n")},2000);*/
-
