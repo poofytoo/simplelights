@@ -1,5 +1,5 @@
 var serialConnection = require('./service');
 var serv = new serialConnection();
 
-serv.discoverPorts()
-setTimeout(function(){serv.sendSimpleCommand()}, 2000);
+serv.turnAllTheFuckOn();
+setTimeout(function(){serv.sendSimpleCommand('a')}, 2000);

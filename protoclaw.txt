@@ -1,0 +1,23 @@
+------------------------
+SIMPLE Protoclaw File
+
+Packet Structure
+[1B SYNC][1b PARITY + 7b ADDR][1B CMD][+DATA]
+
+--
+SYNC: 
+1 Byte to sync. 0xFE
+--
+PARITY:
+Bit for even parity
+--
+ADDR:
+7 Bits to indicate controller board
+--
+CMD:
+0x00  All Off   
+0x03  All On at Full
+0x04  Steady State Full 16, following [2B Bitmask][xB number of respective pwm]
+0x05  Steady State First 8, following [1B Bitmask][xB number of respective pwm]
+0x06  Steady State Last 8, following [1B Bitmask][xB number of respective pwm]
+0x10  Some freaky velocity shit?
