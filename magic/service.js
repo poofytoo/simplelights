@@ -42,14 +42,16 @@ function serialConnection() {
     
     eventEmitter.on('serialHelloConnect', serialHelloConnect);
     discoverPorts();
+    
+    pigeon.systemAllOn();
   }
   
-  this.sendSimpleCommand = function(data){
-    serialwrite(data);
+  this.systemAllOff = function(){
+    serialwrite(pigeon.systemAllOff())
   }
   
-  this.turnAllTheFuckOn = function(){
-    console.log(pigeon.turnAllOn())
+  this.systemAllOn = function(){
+    serialwrite(pigeon.systemAllOn())
   }
   
   serialwrite = function(data){
