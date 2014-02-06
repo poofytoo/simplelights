@@ -1,15 +1,13 @@
 var SerialPort = require("serialport").SerialPort
-var ProtoPigeon = require("./protopigeon");
 var events = require('events');
 var eventEmitter = new events.EventEmitter();
 
 function serialConnection() {
   var CONNECTION_PORT = "/dev/tty.usbmodem1411"
-  var pigeon = new ProtoPigeon();  
   var portFound = false;
   
   this.init = function(){
-    discoverPorts = function(){
+    initPorts = function(){
       var s = require("serialport");
       s.list(function (err, ports) {
         ports.forEach(function(port) {
@@ -41,20 +39,10 @@ function serialConnection() {
     }
     
     eventEmitter.on('serialHelloConnect', serialHelloConnect);
-    discoverPorts();
-    
-    pigeon.systemAllOn();
+    initPorts();
   }
   
-  this.systemAllOff = function(){
-    serialwrite(pigeon.systemAllOff())
-  }
-  
-  this.systemAllOn = function(){
-    serialwrite(pigeon.systemAllOn())
-  }
-  
-  serialwrite = function(data){
+  this.serialwrite = function(data){
     if (portFound){
       serialPort.write(data, function(err, results) {
         if (err != undefined){
