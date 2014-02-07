@@ -42,6 +42,7 @@ function protoPigeon(debug){
   }
   
   packetToCharArray = function(packet, parityBit){
+    console.log(packet)
     out = '';
     for (k in packet){
       byte = (k == 2) ? packet[k] + 128 * parityBit : packet[k];

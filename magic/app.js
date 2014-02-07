@@ -17,14 +17,15 @@ cmd = new Commands(serv);
 // in reality, cmd.systemAllOn on generates adds a systemAllOn string to the queue. once program reaches 'LOOP', checks queue one by one, and creates functions with functions in itself. each has appropriate timers.
 
 cmd.initSync()
-cmd.sleep(5000)
+cmd.sleep(2000)
 cmd.systemAllOn()
-cmd.sleep(200)
-cmd.systemAllOn()
-cmd.sleep(200)
-cmd.systemAllOff()
 cmd.sleep(1000)
-cmd.systemAllOn()
-cmd.loop()
+cmd.systemAllOff()
+cmd.addressAllOn(8)
+cmd.sleep(1000)
+cmd.addressAllOn(7)
+cmd.addressAllOff(8)
+cmd.end()
 
-//holy jebus it works
+//holy fucking shit it works
+//add loop controls

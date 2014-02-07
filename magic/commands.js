@@ -1,4 +1,6 @@
 // Command Management System
+var ProtoPigeon = require("./protopigeon");
+var pigey = new ProtoPigeon()
 
 function commands(service){
   this.s = service;
@@ -11,88 +13,108 @@ function commands(service){
   this.initSync = function(){
     this.procedural = true;
     this.commandQueue = [];
-    this.sleepQueue = [];
   }
   
+  // Turn ALL Lights in the system OFF
   this.systemAllOff = function(){
     if (this.procedural){
-      this.commandQueue.push(this.systemAllOff);
+      this.commandQueue.push([this.systemAllOff]);
     } else {
-      this.s.serialwrite("allOff");
+      this.s.serialwrite(pigey.systemAllOff());
     }
   }
   
+  // Turn ALL Lights in the system ON
   this.systemAllOn = function(){
     if (this.procedural){
-      this.commandQueue.push(this.systemAllOn);
+      this.commandQueue.push([this.systemAllOn]);
     } else {
-      this.s.serialwrite("allOn");
+      this.s.serialwrite(pigey.systemAllOn());
+    }
+  }
+    
+  // Turn OFF all lights of a particular address
+  this.addressAllOff = function(addr){
+    if (this.procedural){
+      this.commandQueue.push([this.addressAllOff, addr]);
+    } else {
+      this.s.serialwrite(pigey.addressAllOff(addr));
     }
   }
   
+  // Turn ON all lights of a particular address
+  this.addressAllOn = function(addr){
+    if (this.procedural){
+      this.commandQueue.push([this.addressAllOn, addr]);
+    } else {
+      this.s.serialwrite(pigey.addressAllOn(addr));
+    }
+  }
+  
+  // In Synchronous mode, delays the next event by t milliseconds
   this.sleep = function(t){
     if (this.procedural){
-      this.commandQueue.push("sleep");
-      this.sleepQueue.push(t);
+      this.commandQueue.push(["sleep", t]);
     } else {
       console.log("cannot run sleep in event mode...")
     }
   }
   
-  this.loop = function(){
+  this.end = function(){
     cq = this.commandQueue;
     sleeptimer = 0;
     functionCount = 0;
     functionQueue = [];
     
-    function genEvent(curr, next, s) { 
+    function genEvent(curr, next, s, data) { 
       this.s = s
       return function() { 
-        console.log(curr)
-        curr();
+        curr(data);
         next();
       }
     }
      
-    function genLastEvent(curr, s) { 
+    function genLastEvent(curr, s, data) { 
       this.s = s
       return function() { 
-        curr();
+        curr(data);
       }
     }
     
-    function genEventWithDelay(curr, next, s, t) { 
+    function genEventWithDelay(curr, next, s, t, data) { 
       this.s = s
       return function() { 
-        curr();
+        curr(data);
         setTimeout(next, t);
       }
     }
     
     for (i in cq){
       ip = cq.length-1-i;
-      cmd = cq[ip]
+      cmd = cq[ip][0]
+      if (cq[ip].length > 1){
+        data = cq[ip][1]
+      }
       if (ip == cq.length-1){
         // Last Function
         // TODO: implement functions for looping params- i.e. infinite loops or 3 loops
         if (true){                
-          functionQueue[functionCount] = genLastEvent(cmd, this.s);
+          functionQueue[functionCount] = genLastEvent(cmd, this.s, data);
           ++functionCount;
         }
       } else if (cmd !== 'sleep') {
         // Any Continuous Function
         if (sleeptimer != 0){
-          console.log(sleeptimer)
           functionQueue[functionCount] = 
-            genEventWithDelay(cmd, functionQueue[functionCount-1], this.s, sleeptimer)
+            genEventWithDelay(cmd, functionQueue[functionCount-1], this.s, sleeptimer, data)
         } else {
-          functionQueue[functionCount] = genEvent(cmd, functionQueue[functionCount-1], this.s)
+          functionQueue[functionCount] = genEvent(cmd, functionQueue[functionCount-1], this.s, data)
         }
         ++functionCount;
         sleeptimer = 0;
       } else if (cmd == 'sleep'){
         // Sleep Function
-        sleeptimer += this.sleepQueue.pop();
+        sleeptimer += data;
       }
     }
     
