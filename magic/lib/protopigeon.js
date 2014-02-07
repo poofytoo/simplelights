@@ -1,30 +1,39 @@
 function protoPigeon(debug){
   this.debug = debug;
   
-  // Turns all lights in the system on
-  this.systemAllOn = function(){
+  // Turns all lights in the system off
+  this.systemAllOff = function(){
     packet = [254, 0, 0]
     if (debug) console.log(packet)
     return packetToCharArray(packet, calculateParity(packet));
   }
   
-  // Turns all lights in the system off
-  this.systemAllOff = function(){
+  // Turns all lights in the system on
+  this.systemAllOn = function(){
     packet = [254, 5, 0]
-    if (debug) console.log(packet)
-    return packetToCharArray(packet, calculateParity(packet));
-  }
-  
-  // Turns all lights of an address on
-  this.addressAllOn = function(addr){
-    packet = [254, 6, addr]
     if (debug) console.log(packet)
     return packetToCharArray(packet, calculateParity(packet));
   }
   
   // Turns all lights of an address off
   this.addressAllOff = function(addr){
+    packet = [254, 6, addr]
+    if (debug) console.log(packet)
+    return packetToCharArray(packet, calculateParity(packet));
+  }
+  
+  // Turns all lights of an address on
+  this.addressAllOn = function(addr){
     packet = [254, 7, addr]
+    if (debug) console.log(packet)
+    return packetToCharArray(packet, calculateParity(packet));
+  }
+  
+  // Turns all lights of an address to VALUE
+  this.addressAllatValue = function(data){
+    addr = Object.keys(data)[0]
+    value = data[addr]
+    packet = [254, 8, parseInt(addr), parseInt(value)]
     if (debug) console.log(packet)
     return packetToCharArray(packet, calculateParity(packet));
   }

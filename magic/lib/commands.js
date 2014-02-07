@@ -7,7 +7,6 @@ function commands(service){
   this.procedural = false
   
   this.init = function(){
-    
   }
   
   this.initSync = function(){
@@ -51,6 +50,15 @@ function commands(service){
     }
   }
   
+  // Turn all lights of an address to a VALUE
+  this.addressAllatValue = function(data){
+    if (this.procedural){
+      this.commandQueue.push([this.addressAllatValue, data]);
+    } else {
+      this.s.serialwrite(pigey.addressAllatValue(data));
+    }
+  }
+  
   // In Synchronous mode, delays the next event by t milliseconds
   this.sleep = function(t){
     if (this.procedural){
@@ -74,10 +82,11 @@ function commands(service){
       }
     }
      
-    function genLastEvent(curr, s, data) { 
+    function genLastEvent(curr, s, data, context) { 
       this.s = s
       return function() { 
         curr(data);
+        context.end();
       }
     }
     
@@ -99,7 +108,7 @@ function commands(service){
         // Last Function
         // TODO: implement functions for looping params- i.e. infinite loops or 3 loops
         if (true){                
-          functionQueue[functionCount] = genLastEvent(cmd, this.s, data);
+          functionQueue[functionCount] = genLastEvent(cmd, this.s, data, this);
           ++functionCount;
         }
       } else if (cmd !== 'sleep') {
