@@ -11,10 +11,15 @@ function commands(service){
   this.initSync = function(){
     this.procedural = true;
     this.commandQueue = [];
+    this.sleepQueue = [];
   }
   
   this.systemAllOff = function(){
-    this.s.serialwrite("1")
+    if (this.procedural){
+      this.commandQueue.push(this.systemAllOff);
+    } else {
+      this.s.serialwrite("allOff");
+    }
   }
   
   this.systemAllOn = function(){
@@ -25,9 +30,10 @@ function commands(service){
     }
   }
   
-  this.sleep = function(){
+  this.sleep = function(t){
     if (this.procedural){
       this.commandQueue.push("sleep");
+      this.sleepQueue.push(t);
     } else {
       console.log("cannot run sleep in event mode...")
     }
@@ -35,22 +41,63 @@ function commands(service){
   
   this.loop = function(){
     cq = this.commandQueue;
+    sleeptimer = 0;
+    functionCount = 0;
     functionQueue = [];
-    console.log(cq)
-    for (i in cq){
-      cmd = cq[i]
-      console.log("HEYYYYYYYY" + cmd)
-      if (cmd !== 'sleep') {
-        functionQueue.push(function(){
-          var t = cmd
-          console.log("thisisnotsupposedtorun" + cmd)
-          cmd()
-          functionQueue[(i+1)]();
-        })
+    
+    function genEvent(curr, next, s) { 
+      this.s = s
+      return function() { 
+        console.log(curr)
+        curr();
+        next();
       }
-      
     }
-    functionQueue[0]();
+     
+    function genLastEvent(curr, s) { 
+      this.s = s
+      return function() { 
+        curr();
+      }
+    }
+    
+    function genEventWithDelay(curr, next, s, t) { 
+      this.s = s
+      return function() { 
+        curr();
+        setTimeout(next, t);
+      }
+    }
+    
+    for (i in cq){
+      ip = cq.length-1-i;
+      cmd = cq[ip]
+      if (ip == cq.length-1){
+        // Last Function
+        // TODO: implement functions for looping params- i.e. infinite loops or 3 loops
+        if (true){                
+          functionQueue[functionCount] = genLastEvent(cmd, this.s);
+          ++functionCount;
+        }
+      } else if (cmd !== 'sleep') {
+        // Any Continuous Function
+        if (sleeptimer != 0){
+          console.log(sleeptimer)
+          functionQueue[functionCount] = 
+            genEventWithDelay(cmd, functionQueue[functionCount-1], this.s, sleeptimer)
+        } else {
+          functionQueue[functionCount] = genEvent(cmd, functionQueue[functionCount-1], this.s)
+        }
+        ++functionCount;
+        sleeptimer = 0;
+      } else if (cmd == 'sleep'){
+        // Sleep Function
+        sleeptimer += this.sleepQueue.pop();
+      }
+    }
+    
+    // Start the Function Queue
+    setTimeout(functionQueue[functionCount-1], sleeptimer);
   }
   
   this.init();
