@@ -68,8 +68,9 @@ function commands(service){
     }
   }
   
-  this.end = function(){
+  this.loop = function(loopCount){
     cq = this.commandQueue;
+    this.loopCount = loopCount
     sleeptimer = 0;
     functionCount = 0;
     functionQueue = [];
@@ -82,11 +83,15 @@ function commands(service){
       }
     }
      
-    function genLastEvent(curr, s, data, context) { 
+    function genLastEvent(curr, s, context, data) { 
       this.s = s
       return function() { 
         curr(data);
-        context.end();
+        if (loopCount == undefined){
+          context.loop();
+        } else if (loopCount > 0){
+          context.loop(loopCount - 1);
+        }
       }
     }
     
@@ -103,12 +108,17 @@ function commands(service){
       cmd = cq[ip][0]
       if (cq[ip].length > 1){
         data = cq[ip][1]
+      } else {
+        data = ''
       }
       if (ip == cq.length-1){
         // Last Function
         // TODO: implement functions for looping params- i.e. infinite loops or 3 loops
-        if (true){                
-          functionQueue[functionCount] = genLastEvent(cmd, this.s, data, this);
+        if (cmd == 'sleep') {
+          console.log("Error: last function cannot be sleep");
+          break;
+        } else {     
+          functionQueue[functionCount] = genLastEvent(cmd, this.s, this, data);
           ++functionCount;
         }
       } else if (cmd !== 'sleep') {

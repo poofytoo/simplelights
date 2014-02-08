@@ -15,11 +15,14 @@ ADDR:
 7 Bits to indicate controller board
 --
 CMD:
+
 0x00  All Off for system (ADDR 0, with Parity)
 0x05  All On for system (ADDR 0, with Parity)
 0x06  All Off for address
 0x07  All On for address
 0x08  All at VALUE for address
+
+For One Address:
 
 0x10  Steady State Full 16, following [2B Bitmask][xB number of respective pwm]
 0x11  Steady State First 8, following [1B Bitmask][xB number of respective pwm]
