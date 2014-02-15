@@ -51,6 +51,7 @@ function serialConnection() {
       });
     } else {
       console.log(data);
+      return data;
     }
   }
   

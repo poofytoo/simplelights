@@ -1,0 +1,41 @@
+<style>
+  body, html {
+    padding: 0;
+    margin: 0;
+  }
+  textarea {
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    border: none;
+    outline: none;
+    line-height: normal;
+    font-size: 14px;
+    font-family: sans-serif;
+  }
+</style>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  
+<textarea></textarea>
+
+<script src="/socket.io/socket.io.js"></script>
+<script type="text/javascript">
+  var socket = io.connect('http://localhost');
+  socket.on('errormsg', function (data) {
+     $('textarea').val($('textarea').val() + data + "\n");
+    console.log(data);
+  });
+  $('textarea').keypress(function(e) {
+  console.log(e.which);
+    if(e.which == 13) {
+      msg = $('textarea').val();
+      sp = msg.lastIndexOf('\n');
+      if (sp == -1){
+        sp = 0;
+      } else {
+        ++sp;
+      }
+      socket.emit('msg', msg.slice(sp));
+    }
+  });
+</script>

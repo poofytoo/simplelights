@@ -59,6 +59,15 @@ function commands(service){
     }
   }
   
+  // Set lights of an address to VALUES
+  this.steadyValues = function(data){
+    if (this.procedural){
+      this.commandQueue.push([this.steadyValues, data]);
+    } else {
+      this.s.serialwrite(pigey.steadyValues(data))
+    }
+  }
+  
   // In Synchronous mode, delays the next event by t milliseconds
   this.sleep = function(t){
     if (this.procedural){
@@ -91,6 +100,8 @@ function commands(service){
           context.loop();
         } else if (loopCount > 0){
           context.loop(loopCount - 1);
+        } else {
+          context.procedural = false;
         }
       }
     }
